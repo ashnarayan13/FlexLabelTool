@@ -1,12 +1,3 @@
-# -------------------------------------------------------------------------------
-# Name:        Object bounding box label tool
-# Purpose:     Label object bboxes for ImageNet Detection data
-# Author:      Qiushi
-# Created:     06/06/2014
-
-#
-# -------------------------------------------------------------------------------
-# from __future__ import division
 from tkinter import *
 from PIL import Image, ImageTk
 import os
