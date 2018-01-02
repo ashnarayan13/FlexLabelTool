@@ -8,10 +8,12 @@ This is a labeling tool to label objects to train neural networks.
 ## Requirements
 The project requires
 
-* Python3
-* Tkinter
-* Pillow
-* opencv2
+* python3
+* tkinter
+* pillow
+* xml
+* glob
+* argparse
 
 ## Run tool
 
@@ -19,4 +21,21 @@ To run the tool. Use the `run.sh` script by passing the folder path for the imag
 
 or
 
-`python3 label.py --input_folder='/path/to/image_folder/` 
+`python3 boundingBox.py --input_directory=/path/to/images --output_directory=/path/to/output --classes=30 --choice=3` 
+
+set `--choice` to 1 for YOLO darknet format
+
+> class x y w h
+
+set `--choice` to 2 for imagenet format without XML
+
+> number of bounding boxes
+> x1 y1 x2 y2
+
+set `--choice` to 3 for Pascal VOC format with XML output
+
+Do not press back when using `--choice` 1 and 3 as they are not converted back to x y coordinates to display and hence will delete the labels
+
+## Acknowledgements
+
+The base code if from https://github.com/puzzledqs/BBox-Label-Tool
