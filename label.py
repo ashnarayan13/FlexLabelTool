@@ -64,11 +64,13 @@ def main():
     global write_data
     global write_data1
     global counter
+    global saveFormat
     image_paths = load_images_from_folder(FLAGS.input_folder)
     counter = 0
-    write_data = open("containers.txt", "w")
-    write_data1 = open("not_containers.txt", "w")
+    write_data = open("labeled.txt", "w")
+    write_data1 = open("not_labeled.txt", "w")
     initialize_nodes = tkinter.Tk()
+    saveFormat = tkinter.IntVar()
     initialize_nodes.title("Initialization")
     canvas = Canvas(initialize_nodes, width=600, height=600)
     canvas.pack()
@@ -77,11 +79,13 @@ def main():
     button2 = tkinter.Button(initialize_nodes, text="Not Container", command=skip_data)
     button3 = tkinter.Button(initialize_nodes, text="Skip", command=skip_image)
     button4 = tkinter.Button(initialize_nodes, text="Exit", command=exit_loop)
+    radio = tkinter.Radiobutton(initialize_nodes, text="YOLO", padx=20, variable=saveFormat, value=1)
     button.pack(side=LEFT)
     button1.pack(side=LEFT)
     button2.pack(side=LEFT)
     button3.pack(side=LEFT)
     button4.pack(side=LEFT)
+    radio.pack(side=LEFT)
     initialize_nodes.mainloop()
 
 if __name__ == '__main__':
