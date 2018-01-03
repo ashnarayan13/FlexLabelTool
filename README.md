@@ -12,16 +12,16 @@ The project requires
 * tkinter
 * pillow
 * xml
-* glob
+* opencv
 * argparse
 
 ## Run tool
 
-To run the tool. Use the `run.sh` script by passing the folder path for the images
+To run the tool. Use the `run.sh` script to run the samples.
 
 or
 
-`python3 boundingBox.py --input_directory=/path/to/images --output_directory=/path/to/output --classes=30 --choice=3` 
+`python3 boundingBox.py --input_directory=/path/to/images --output_directory=/path/to/output --classes=/path/to/class_list.txt --choice=3` 
 
 set `--choice` to 1 for YOLO darknet format
 
@@ -35,6 +35,8 @@ set `--choice` to 2 for imagenet format without XML
 set `--choice` to 3 for Pascal VOC format with XML output
 
 Do not press back when using `--choice` 1 and 3 as they are not converted back to x y coordinates to display and hence will delete the labels
+
+The `--classes` parameter needs a text file with the class names. It picks up the class name to add to the XML.
 
 ## Acknowledgements
 

@@ -1,10 +1,10 @@
 from tkinter import *
 from PIL import Image, ImageTk
 import os
-import glob
 import argparse
 import xml.etree as ET
 import xml.etree.cElementTree as etree
+import cv2
 
 # colors for the bboxes
 COLORS = ['red', 'blue', 'yellow', 'pink', 'cyan', 'green', 'black']
@@ -19,9 +19,12 @@ class Labeling():
         self.frame.pack(fill=BOTH, expand=1)
         self.parent.resizable(width=FALSE, height=FALSE)
 
+
         # initialize global state
         self.imageDir = str(arguments.input_directory)
         self.imageList = []
+        self.classList = open(str(arguments.classes)).readlines()
+        print(self.classList)
         self.outDir = str(arguments.output_directory)
         self.cur = 0
         self.total = 0
@@ -29,8 +32,9 @@ class Labeling():
         self.imagename = ''
         self.labelfilename = ''
         self.tkimg = None
-        self.objectClass = int(arguments.classes)
+        self.objectClass = len(self.classList)
         self.choice = int(arguments.choice)
+        self.className = []
 
         # initialize mouse state
         self.STATE = {}
@@ -69,7 +73,7 @@ class Labeling():
         self.btnDel.grid(row=3, column=2, sticky=W + E + N)
         self.btnClear = Button(self.frame, text='ClearAll', command=self.clearbox)
         self.btnClear.grid(row=4, column=2, sticky=W + E + N)
-        self.slider = Scale(self.frame, from_=0, to=self.objectClass, orient=HORIZONTAL)
+        self.slider = Scale(self.frame, from_=0, to=self.objectClass-1, orient=HORIZONTAL)
         self.slider.grid(row=0, column=1, sticky=W + E)
 
         # control panel for image navigation
@@ -97,8 +101,10 @@ class Labeling():
 
     def loaddir(self):
         # get image list
-        # self.imageDir = ('/home/ashwath/PycharmProjects/labelTool/Images/NFPA dataset/')
-        self.imageList = glob.glob(os.path.join(self.imageDir, '*.jpg'))
+        for filename in os.listdir(self.imageDir):
+            img = cv2.imread(os.path.join(self.imageDir,filename))
+            if img is not None:
+                self.imageList.append(os.path.join(self.imageDir,filename))
         if len(self.imageList) == 0:
             print('No .JPEG images found in the specified dir!')
             return
@@ -183,8 +189,8 @@ class Labeling():
     def convertxml(self):
         image = Image.open(self.imageList[self.cur - 1])
         root = etree.Element('annotation')
-        etree.SubElement(root, "folder").text = str(os.curdir)
-        etree.SubElement(root, "filename").text = str((self.imageList[self.cur - 1]))
+        etree.SubElement(root, "folder").text = str(os.path.basename(os.getcwd()))
+        etree.SubElement(root, "filename").text = str(str(self.imageList[self.cur-1]).split('/')[-1])
         etree.SubElement(root, "path").text = str(self.imageList[self.cur - 1])
         source = etree.SubElement(root, "source")
         etree.SubElement(source, "database").text = "Unknown"
@@ -193,9 +199,10 @@ class Labeling():
         etree.SubElement(size, "height").text = str(image.height)
         etree.SubElement(size, "depth").text = "3"
         etree.SubElement(root, "segmented").text = "0"
+        temp = 0
         for j in self.bboxList:
             object = etree.SubElement(root, "object")
-            etree.SubElement(object, "name").text = "container"
+            etree.SubElement(object, "name").text = str(self.className[temp])
             etree.SubElement(object, "pose").text = "Unspecified"
             etree.SubElement(object, "truncated").text = "0"
             etree.SubElement(object, "difficult").text = "0"
@@ -204,6 +211,7 @@ class Labeling():
             etree.SubElement(bndbox, "ymin").text = str(j[2])
             etree.SubElement(bndbox, "xmax").text = str(j[3])
             etree.SubElement(bndbox, "ymax").text = str(j[4])
+            temp = temp + 1
         et = ET.cElementTree.ElementTree(root)
         et.write(self.labelfilename, xml_declaration=False, encoding='utf-8', method="xml")
 
@@ -216,6 +224,10 @@ class Labeling():
             self.bboxList.append((self.slider.get(), x1, y1, x2, y2))
             self.bboxIdList.append(self.bboxId)
             self.bboxId = None
+            self.className.append(self.classList[self.slider.get()])
+            print(self.slider.get())
+            print(self.className)
+            print(self.classList[self.slider.get()])
             self.listbox.insert(END, '(%d, %d) -> (%d, %d)' % (x1, y1, x2, y2))
             self.listbox.itemconfig(len(self.bboxIdList) - 1, fg=COLORS[(len(self.bboxIdList) - 1) % len(COLORS)])
         self.STATE['click'] = 1 - self.STATE['click']
@@ -261,6 +273,7 @@ class Labeling():
         self.bboxIdList = []
         self.bboxList = []
         self.yolobox = []
+        self.className = []
 
     def previmage(self, event=None):
         self.saveimage()
