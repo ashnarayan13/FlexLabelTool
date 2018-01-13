@@ -2,8 +2,6 @@
 
 This is a labeling tool to label objects to train neural networks. 
 
-**_This project is still under development_**
-
 
 ## Requirements
 The project requires
