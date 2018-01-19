@@ -61,7 +61,7 @@ class Labeling():
         self.parent.bind("<Escape>", self.cancelbox)  # press <Espace> to cancel current bbox
         self.parent.bind("s", self.cancelbox)
         self.parent.bind("a", self.previmage)  # press 'a' to go backforward
-        self.parent.bind("d", self.nextimage)  # press 'd' to go forward
+        self.parent.bind("<space>", self.nextimage)  # press 'd' to go forward
         self.mainPanel.grid(row=1, column=1, rowspan=4, sticky=W + N)
 
         # showing bbox info & delete bbox
@@ -262,9 +262,6 @@ class Labeling():
             self.bboxIdList.append(self.bboxId)
             self.bboxId = None
             self.className.append(self.classList[self.slider.get()])
-            #print(self.slider.get())
-            #print(self.className)
-            #print(self.classList[self.slider.get()])
             self.listbox.insert(END, '(%d, %d) -> (%d, %d)' % (x1, y1, x2, y2))
             self.listbox.itemconfig(len(self.bboxIdList) - 1, fg=COLORS[(len(self.bboxIdList) - 1) % len(COLORS)])
         self.STATE['click'] = 1 - self.STATE['click']
@@ -330,14 +327,6 @@ class Labeling():
             self.saveimage()
             self.cur = idx
             self.loadimage()
-
-
-##    def setImage(self, imagepath = r'test2.png'):
-##        self.img = Image.open(imagepath)
-##        self.tkimg = ImageTk.PhotoImage(self.img)
-##        self.mainPanel.config(width = self.tkimg.width())
-##        self.mainPanel.config(height = self.tkimg.height())
-##        self.mainPanel.create_image(0, 0, image = self.tkimg, anchor=NW)
 
 if __name__ == '__main__':
     root = Tk()

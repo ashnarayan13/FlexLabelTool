@@ -18,9 +18,6 @@ counter = 1
 index_test = round(100 / percentage_test)
 for pathAndFilename in glob.iglob(os.path.join(current_dir, "*.jpg")):
     title, ext = os.path.splitext(os.path.basename(pathAndFilename))
-    #file = open(title + '.txt', 'w')
-    #file.write('0 0.5 0.5 1 1')
-    #file.close()
 
     if counter == index_test:
         counter = 1

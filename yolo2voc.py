@@ -42,38 +42,40 @@ def loaddir(input_l_dir,input_i_dir, output):
     width = 1280
     for filename in os.listdir(input_l_dir):
         file = open(os.path.join(input_l_dir, filename), 'r')
-        points = []
-        for line in file.readlines():
-            temp = []
-            x = float(line.split(" ")[1])
-            y = float(line.split(" ")[2])
-            w = float(line.split(" ")[3])
-            h = float(line.split(" ")[4].split("/n")[0])
-            print(x,y,w,h)
+        if '.txt' in filename:
+            points = []
+            print(filename)
+            for line in file.readlines():
+                temp = []
+                x = float(line.split(" ")[1])
+                y = float(line.split(" ")[2])
+                w = float(line.split(" ")[3])
+                h = float(line.split(" ")[4].split("/n")[0])
+                print(x,y,w,h)
 
-            filename_im = filename.split(".")[0] + ".png"
-            xml_save_loc = filename.split(".")[0] + ".xml"
-            xml_save = os.path.join(output, xml_save_loc)
-            curr_im = cv2.imread(os.path.join(input_i_dir, filename_im))
-            if curr_im is not None:
-                im_h, im_w, im_c = curr_im.shape
-                assert im_h == height
-                assert im_w == width
-            x = x * width
-            w = w * width
-            y = y * height
-            h = h * height
-            xmin = x - w/2
-            xmax = x + w/2
-            ymin = y - h/2
-            ymax = y + h/2
-            temp.append(xmin)
-            temp.append(ymin)
-            temp.append(xmax)
-            temp.append(ymax)
-            points.append(temp)
-            print(xmax,xmin,ymax,ymin)
-            convertxml(points,xml_save, os.path.join(input_i_dir, filename_im))
+                filename_im = filename.split(".")[0] + ".png"
+                xml_save_loc = filename.split(".")[0] + ".xml"
+                xml_save = os.path.join(output, xml_save_loc)
+                curr_im = cv2.imread(os.path.join(input_i_dir, filename_im))
+                if curr_im is not None:
+                    im_h, im_w, im_c = curr_im.shape
+                    assert im_h == height
+                    assert im_w == width
+                x = x * width
+                w = w * width
+                y = y * height
+                h = h * height
+                xmin = x - w/2
+                xmax = x + w/2
+                ymin = y - h/2
+                ymax = y + h/2
+                temp.append(xmin)
+                temp.append(ymin)
+                temp.append(xmax)
+                temp.append(ymax)
+                points.append(temp)
+                print(xmax,xmin,ymax,ymin)
+                convertxml(points,xml_save, os.path.join(input_i_dir, filename_im))
 
 
 if __name__ == '__main__':
