@@ -24,7 +24,7 @@ class Labeling():
         self.imageDir = str(arguments.input_directory)
         self.imageList = []
         self.classList = open(str(arguments.classes)).readlines()
-        print(self.classList)
+        #print(self.classList)
         self.outDir = str(arguments.output_directory)
         self.cur = 0
         self.total = 0
@@ -141,11 +141,30 @@ class Labeling():
         if os.path.exists(self.labelfilename):
             with open(self.labelfilename) as f:
                 for (i, line) in enumerate(f):
-                    if i == 0:
-                        # bbox_cnt = int(line.strip())
-                        continue
-                    tmp = [int(t.strip()) for t in line.split()]
-                    self.bboxList.append(tuple(tmp))
+                    if self.choice ==2:
+                        if i == 0:
+                            continue
+                    if self.choice==2:
+                        tmp = [int(t.strip()) for t in line.split()]
+                        self.bboxList.append(tuple(tmp))
+                    if self.choice == 1:
+                        yolo_points = [float(t.strip()) for t in line.split()]
+                        width, height = self.img.size
+                        x = yolo_points[1] * width
+                        w = yolo_points[3] * width
+                        y = yolo_points[2] * height
+                        h = yolo_points[4] * height
+                        xmin = x - w / 2
+                        xmax = x + w / 2
+                        ymin = y - h / 2
+                        ymax = y + h / 2
+                        tmp = []
+                        tmp.append(yolo_points[0])
+                        tmp.append(xmin)
+                        tmp.append(ymin)
+                        tmp.append(xmax)
+                        tmp.append(ymax)
+                        self.bboxList.append(tuple(tmp))
                     tmpId = self.mainPanel.create_rectangle(tmp[1], tmp[2],tmp[3], tmp[4], width=2, outline=COLORS[(len(self.bboxList) - 1) % len(COLORS)])
                     self.bboxIdList.append(tmpId)
                     self.listbox.insert(END, '(%d, %d) -> (%d, %d)' % (tmp[1], tmp[2], tmp[3], tmp[4]))
@@ -167,6 +186,12 @@ class Labeling():
                     f.write(' '.join(map(str, bbox)) + '\n')
         elif self.choice == 3:
             self.convertxml()
+        elif self.choice == 4:
+            self.convertcv()
+            with open(self.labelfilename, 'w') as f:
+                for bbox in self.yolobox:
+                    # f.write('%d ' % self.slider.get())
+                    f.write(' '.join(map(str, bbox)) + '\n')
         print('Image No. %d saved' % (self.cur))
 
     def convertyolo(self):
@@ -183,6 +208,18 @@ class Labeling():
             w = w * dw
             y = y * dh
             h = h * dh
+            tmp = [j[0], x, y, w, h]
+            self.yolobox.append(tuple(tmp))
+    def convertcv(self):
+        image = Image.open(self.imageList[self.cur - 1])
+        dw = 1. / image.width
+        dh = 1. / image.height
+        # print(len(self.bboxList))
+        for j in self.bboxList:
+            x = j[1]
+            y = j[2]
+            w = j[3] - j[1]
+            h = j[4] - j[2]
             tmp = [j[0], x, y, w, h]
             self.yolobox.append(tuple(tmp))
 
@@ -225,9 +262,9 @@ class Labeling():
             self.bboxIdList.append(self.bboxId)
             self.bboxId = None
             self.className.append(self.classList[self.slider.get()])
-            print(self.slider.get())
-            print(self.className)
-            print(self.classList[self.slider.get()])
+            #print(self.slider.get())
+            #print(self.className)
+            #print(self.classList[self.slider.get()])
             self.listbox.insert(END, '(%d, %d) -> (%d, %d)' % (x1, y1, x2, y2))
             self.listbox.itemconfig(len(self.bboxIdList) - 1, fg=COLORS[(len(self.bboxIdList) - 1) % len(COLORS)])
         self.STATE['click'] = 1 - self.STATE['click']

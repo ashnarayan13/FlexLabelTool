@@ -1,6 +1,1 @@
-car
-person
-cat
-motorcycle
-toy
-dog
+cone
